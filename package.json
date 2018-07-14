@@ -1,0 +1,65 @@
+{
+  "name": "hot-relay",
+  "productName": "hot-relay",
+  "version": "1.0.0",
+  "description": "My Electron application description",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "concurrently --kill-others \"npm run dev-electron\" \"npm run dev-ui\"",
+    "dev-electron": "electromon ./src/index.js;",
+    "dev-ui": "cd ./relay-ui; npm run dev",
+    "build": "cd ./relay-ui; npm run build; cd ..; npm run package;",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
+  },
+  "keywords": [],
+  "author": "lok",
+  "license": "MIT",
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "hot_relay"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "electron-is-dev": "^0.3.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "express": "^4.16.3",
+    "opn": "^5.3.0",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.22",
+    "@electron-forge/maker-deb": "^6.0.0-beta.22",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.22",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.22",
+    "@electron-forge/maker-zip": "^6.0.0-beta.22",
+    "concurrently": "^3.6.0",
+    "electromon": "^1.0.10",
+    "electron": "2.0.5"
+  }
+}
