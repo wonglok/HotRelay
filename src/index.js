@@ -21,7 +21,9 @@ const opn = require('opn');
 let mainWindow;
 
 const createWindow = () => {
-  opn('http://localhost:2329')
+  if (!isDev) {
+    opn('http://localhost:2329')
+  }
 
   // // Create the browser window.
   // mainWindow = new BrowserWindow({
