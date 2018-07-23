@@ -2,6 +2,8 @@
   <div class="hello">
     <button @click="send">Hea Hea Hea</button>
     <input type="range" step="0.000001" min="-100" max="100" v-model="slider" @input="send">
+    <button @click="load">Load</button>
+    <button @click="save">Save to disk</button>
   </div>
 </template>
 
@@ -16,14 +18,22 @@ export default {
       msg: 'Welcome to Your Vue.js App'
     }
   },
+  mounted () {
+    SOC.$on('hot-relay-message', (data) => {
+      this.slider = data.slider
+    })
+  },
   methods: {
+    load () {
+      SOC.$emit('load-folder')
+    },
+    save () {
+      SOC.$emit('commit-to-disk')
+    },
     send () {
-      SOC.$on('chat-message', (data) => {
-        this.slider = data.slider
-      })
-      SOC.$emit('chat-message', {
+      SOC.$emit('hot-relay-message', {
         haha: Math.random(),
-        slider: this.slider
+        slider: Number(this.slider)
       })
     }
   }

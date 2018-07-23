@@ -6,16 +6,18 @@ module.exports.run = ({ port, mode }) => {
   var io = require('socket.io')(http);
 
   if (mode === 'api') {
-    io.on('connection', function(socket){
-      socket.on('chat-message', function(msg){
-        io.emit('chat-message', msg);
-      });
-    });
+    require('./socket/socket.js').setup({ io })
   } else {
     app.use(express.static(path.join(__dirname, '../dist')));
   }
 
   http.listen(port, function(){
     console.log('listening on *:' + port);
+  });
+
+  process.on( 'SIGTERM', function () {
+    http.close(function () {
+      console.log( "Closed out remaining connections.");
+    });
   });
 }

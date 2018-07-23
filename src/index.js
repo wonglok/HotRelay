@@ -1,5 +1,5 @@
+// is dev env
 const isDev = require('electron-is-dev')
-
 if (!isDev) {
   require('./express/main.js').run({ port: 2328, mode: 'api' })
   require('./express/main.js').run({ port: 2329, mode: 'html' })
@@ -7,6 +7,7 @@ if (!isDev) {
   require('./express/main.js').run({ port: 2328, mode: 'api' })
 }
 
+//electron
 const { app, BrowserWindow } = require('electron');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -20,10 +21,14 @@ const opn = require('opn');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-const createWindow = () => {
+const onReady = () => {
+  // production
   if (!isDev) {
     opn('http://localhost:2329')
   }
+
+  require('./electron/tray.js');
+  require('./electron/loader.js');
 
   // // Create the browser window.
   // mainWindow = new BrowserWindow({
@@ -51,7 +56,7 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', onReady);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -66,7 +71,7 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
-    createWindow();
+    onReady();
   }
 });
 
