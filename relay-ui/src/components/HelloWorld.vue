@@ -1,9 +1,14 @@
 <template>
   <div class="hello">
-    <button @click="send">Hea Hea Hea</button>
-    <input type="range" step="0.000001" min="-100" max="100" v-model="slider" @input="send">
-    <button @click="load">Load</button>
-    <button @click="save">Save to disk</button>
+    <button @click="load">Select Folder on PC / Mac</button>
+
+    <div class="fun" v-if="root.ready">
+
+      <input type="range" step="0.000001" min="-100" max="100" v-model="root.state.slider" @input="tell">
+      <button @click="saveToDisk">Save to Disk</button><span v-if="root.unsaved">File Unsaved</span>
+      <pre>{{ root.state }}</pre>
+    </div>
+
   </div>
 </template>
 
@@ -14,27 +19,22 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
+      root: SOC.root,
       slider: 0,
       msg: 'Welcome to Your Vue.js App'
     }
   },
   mounted () {
-    SOC.$on('hot-relay-message', (data) => {
-      this.slider = data.slider
-    })
   },
   methods: {
     load () {
       SOC.$emit('load-folder')
     },
-    save () {
+    saveToDisk () {
       SOC.$emit('commit-to-disk')
     },
-    send () {
-      SOC.$emit('hot-relay-message', {
-        haha: Math.random(),
-        slider: Number(this.slider)
-      })
+    tell () {
+      SOC.$emit('tell-state', this.root.state)
     }
   }
 }

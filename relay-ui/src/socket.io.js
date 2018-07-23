@@ -3,10 +3,15 @@ import io from 'socket.io-client'
 export const socket = io('http://' + window.location.hostname + ':2328')
 export const $emit = socket.emit.bind(socket)
 export const $on = socket.on.bind(socket)
+export const root = {
+  $forceUpdate () {},
+  get ready () {
+    return !!this.state.time
+  },
+  state: {
+  }
+}
 
-$on('hot-relay-message', (data) => {
-  console.log(data)
-})
 $on('connect', () => {
   console.log('connected')
 })
@@ -15,6 +20,13 @@ $on('disconnect', () => {
 })
 
 $emit('req/state')
-$on('res/state', (data) => {
-  console.log(data)
+$on('res/state', (state) => {
+  root.state = state
+})
+
+$on('not-yet-saved-to-disk', () => {
+  root.unsaved = true
+})
+$on('saved-to-disk', () => {
+  root.unsaved = false
 })

@@ -1,4 +1,4 @@
-var evt = require('../../electron/evt');
+var srv = require('../../electron/srv');
 var state = require('../../electron/state');
 
 module.exports.setup = ({ io }) => {
@@ -8,25 +8,34 @@ module.exports.setup = ({ io }) => {
       io.emit('hot-relay-message', data);
     });
 
+    // one to one
     socket.on('req/state', () => {
       socket.emit('res/state', state);
     });
 
+    socket.on('tell-state', (newState) => {
+      Object.keys(newState).forEach((nKey) => {
+        state[nKey] = newState[nKey]
+      })
+      io.emit('res/state', state);
+      srv.emit('shall-backup-later', { io })
+    })
 
-
-    // when folder is selected then update all client for info.
-    evt.on('folder-selected', () => {
-      socket.emit('res/state', state);
+    // server update all clients
+    srv.on('update-all-client-state', () => {
+      // console.log(state);
+      io.emit('res/state', state);
     })
 
     // ui request load folder
     socket.on('load-folder', () => {
-      evt.emit('load-folder')
+      srv.emit('load-folder')
     });
 
     // ui reqeust save to disk
     socket.on('commit-to-disk', () => {
-      evt.emit('commit-to-disk', state)
+      srv.emit('commit-to-disk', state)
+      io.emit('saved-to-disk')
     })
 
   });

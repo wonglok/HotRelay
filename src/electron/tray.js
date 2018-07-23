@@ -3,7 +3,7 @@ const Tray = electron.Tray;
 const Menu = electron.Menu;
 const app = electron.app;
 const shell = require('electron').shell;
-const evt = require('./evt');
+const srv = require('./srv');
 
 
 var platform = require('os').platform();
@@ -27,7 +27,7 @@ const contextMenu = Menu.buildFromTemplate([
   {
     label: 'Select Hot Relay Folder',
     click: function () {
-      evt.emit('load-folder')
+      srv.emit('load-folder')
     }
   },
   {
@@ -47,6 +47,6 @@ const contextMenu = Menu.buildFromTemplate([
 
 appIcon.setToolTip('Hot Relay.')
 appIcon.setContextMenu(contextMenu)
-app.dock.hide()
+// app.dock.hide()
 
 module.exports.appIcon = appIcon
