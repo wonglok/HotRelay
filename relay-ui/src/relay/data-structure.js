@@ -47,6 +47,20 @@ export const DataTypes = [
         ]
       }
     }
+  },
+  {
+    _id: 'drawing',
+    name: 'Drawing Editor',
+
+    makeOne () {
+      return {
+        _id: makeID(),
+        name: this.name,
+        type: this._id,
+        ready: false,
+        path: 'drawing/my-drawings'
+      }
+    }
   }
 ]
 

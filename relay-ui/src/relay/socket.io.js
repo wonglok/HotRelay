@@ -80,15 +80,19 @@ export const sync = {
     this.onRemove(instruction)
     $emit('delta-remove', instruction)
   },
-  update (value) {
+
+  updateTimer: 0,
+  update (value, timer) {
     let instruction = {
       id: value._id,
       data: value
     }
     this.onUpdate(instruction)
+    clearTimeout(this.updateTimer)
+
+    this.onUpdate(instruction)
     $emit('delta-update', instruction)
   },
-
   onAdd: (instruction) => {
     const arr = provideArray()
     arr.push(instruction.data)

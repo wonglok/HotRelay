@@ -1,10 +1,9 @@
 <template>
-<div>
-  <div v-if="item">
-    <!-- <button class="close-btn" @click="$emit('close')">X</button> -->
-    <ShaderEditor :item="item" v-if="item && item.type === 'vs-fs-shader'"/>
-    <SliderEditor :item="item" v-if="item && item.type === 'sliders'" />
-  </div>
+<div class="full">
+  <!-- <button class="close-btn" @click="$emit('close')">X</button> -->
+  <ShaderEditor class="full" :item="item" v-if="item && item.type === 'vs-fs-shader'"/>
+  <SliderEditor class="full" :item="item" v-if="item && item.type === 'sliders'" />
+  <DrawEditor class="full" :item="item" v-if="item && item.type === 'drawing'" />
 </div>
 </template>
 
@@ -12,6 +11,7 @@
 import * as SOC from '@/relay/socket.io.js'
 import ShaderEditor from './ShaderEditor.vue'
 import SliderEditor from './SliderEditor.vue'
+import DrawEditor from './DrawEditor.vue'
 
 export default {
   props: {
@@ -19,7 +19,8 @@ export default {
   },
   components: {
     ShaderEditor,
-    SliderEditor
+    SliderEditor,
+    DrawEditor
   },
   data () {
     return {
@@ -38,5 +39,8 @@ export default {
 </script>
 
 <style scoped>
-
+.full{
+  width: 100%;
+  height: 100%;
+}
 </style>

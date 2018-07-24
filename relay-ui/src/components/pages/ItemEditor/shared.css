@@ -1,0 +1,41 @@
+
+.pather{
+  width: calc(100% - 12px);
+  font-size: 25px;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  outline: transparent 1px;
+  appearance: none;
+  padding-left: 10px;
+  margin-bottom: 10px;
+  text-decoration: underline;
+}
+.title{
+  display: block;
+  font-size: 15px;
+  padding-left: 10px;
+}
+
+.link{
+  cursor: pointer;
+  color: rgb(98, 98, 218);
+  text-decoration: underline;
+}
+
+.editor{
+  overflow-x: hidden;
+  height: calc(100%);
+  width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.header{
+  height: calc(70px - 10px * 3);
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+.se{
+  height: calc(100px - 70px);
+}

@@ -1,19 +1,22 @@
 <template>
   <div class="hello">
-    <h2>Hot Relay Configuration</h2>
-    <button @click="loadFolder">Select Server's Hot Realy Folder then Load Data</button>
+    <div class="relay"  v-show="!itemID">
+      <h2>Hot Relay Configuration</h2>
+      <button @click="loadFolder">Select Server's Hot Realy Folder then Load Data</button>
 
-    <div class="fun" v-if="root.ready">
+      <div class="fun" v-if="root.ready">
 
-      <!-- <input type="range" step="0.000001" min="-100" max="100" v-model="root.state.slider" @input="tell"> -->
-      <button @click="saveToDisk">Commit To Server's Disk</button><span v-if="!root.saved">haven't commit to server's disk</span>
+        <!-- <input type="range" step="0.000001" min="-100" max="100" v-model="root.state.slider" @input="tell"> -->
+        <button @click="saveToDisk">Commit To Server's Disk</button><span v-if="!root.saved">haven't commit to server's disk</span>
 
-      <ItemMaker />
-      <ItemList @itemID="(v) => { itemID = v }" />
-      <ItemEditor class="item-editor" v-if="itemID" :itemID="itemID" @close="() => { itemID = false }" />
+        <ItemMaker />
+        <ItemList @itemID="(v) => { itemID = v }" />
 
-      <pre class="pre">{{ root }}</pre>
+        <pre class="pre">{{ root }}</pre>
+      </div>
     </div>
+
+    <ItemEditor class="item-editor" v-if="itemID" :itemID="itemID" @close="() => { itemID = false }" />
 
   </div>
 </template>
@@ -55,18 +58,21 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .hello{
-  margin: 30px;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .item-editor{
-  position: fixed;
+  position: absolute;
   top: 0px;
   left: 0px;
   width: 100%;
   height: 100%;
-  background-color: rgba(255,255,255,0.8);
-  overflow-y: auto;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
+  background-color: rgba(255,255,255,0.8);
 }
 
 .pre{

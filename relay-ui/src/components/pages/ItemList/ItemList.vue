@@ -45,6 +45,7 @@ export default {
 
 <style scoped>
 .pather{
+  font-size: 17px;
   width: 95%;
 }
 </style>
