@@ -69,7 +69,7 @@ export const sync = {
       id: value._id,
       data: newValue
     }
-    this.onAdd(instruction)
+    sync.onAdd(instruction)
     $emit('delta-add', instruction)
   },
   remove (value) {
@@ -77,20 +77,17 @@ export const sync = {
       id: value._id,
       data: value
     }
-    this.onRemove(instruction)
+    sync.onRemove(instruction)
     $emit('delta-remove', instruction)
   },
 
   updateTimer: 0,
-  update (value, timer) {
+  update (value) {
     let instruction = {
       id: value._id,
       data: value
     }
-    this.onUpdate(instruction)
-    clearTimeout(this.updateTimer)
-
-    this.onUpdate(instruction)
+    sync.onUpdate(instruction)
     $emit('delta-update', instruction)
   },
   onAdd: (instruction) => {

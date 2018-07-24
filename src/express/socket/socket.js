@@ -84,5 +84,10 @@ module.exports.setup = ({ io }) => {
       socket.broadcast.to(HOT_RELAY_ROOM).emit('delta-update', instruction)
       touched()
     })
+
+    socket.on('drawboard-draw', (instruction) => {
+      socket.broadcast.to(HOT_RELAY_ROOM).emit('drawboard-draw', instruction)
+      touched()
+    })
   })
 }

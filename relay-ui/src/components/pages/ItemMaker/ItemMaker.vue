@@ -1,7 +1,7 @@
 <template>
 <div>
   <h2>Item maker</h2>
-  <select v-model="newFileType">
+  <select class="selector" v-model="newFileType">
     <option :value="type._id" :key="type._id" v-for="type in DS.DataTypes">{{ type.name }}</option>
   </select>
 
@@ -34,4 +34,7 @@ export default {
 
 <style scoped>
 
+.selector{
+  font-size: 18px;
+}
 </style>

@@ -4,16 +4,22 @@
     <span class="title"><span class="link" @click="$parent.$emit('close')">Home</span> / Slider Editor</span>
     <input type="text" class="pather" v-model="item.path" @input="onKeyStroke(item)" autofocus @keydown.esc="$parent.$emit('close')">
   </div>
-  <canvas ref="canvas" class="canvas"></canvas>
+  <DrawBoard
+    :info="item"
+    @draw-update="onKeyStroke(item)"
+  />
+  <!-- <canvas ref="canvas" class="canvas"></canvas> -->
 </div>
 
 </template>
 
 <script>
 import * as SOC from '@/relay/socket.io.js'
+import DrawBoard from './DrawBoard.vue'
 
 export default {
   components: {
+    DrawBoard
   },
   props: {
     item: {}
@@ -23,14 +29,14 @@ export default {
     }
   },
   mounted () {
-    let resizer = () => {
-      let canvas = this.$refs['canvas']
-      var rect = canvas.getBoundingClientRect()
-      canvas.width = rect.width
-      canvas.height = rect.height
-    }
-    window.addEventListener('resize', resizer, false)
-    resizer()
+    // let resizer = () => {
+    //   let canvas = this.$refs['canvas']
+    //   var rect = canvas.getBoundingClientRect()
+    //   canvas.width = rect.width
+    //   canvas.height = rect.height
+    // }
+    // window.addEventListener('resize', resizer, false)
+    // resizer()
   },
   methods: {
     onKeyStroke (item) {
@@ -39,10 +45,6 @@ export default {
     onSave (item) {
       SOC.sync.update(item)
       SOC.sync.commitToDisk()
-    },
-    remove (iS) {
-      this.item.sliders.splice(iS, 1)
-      SOC.sync.update(this.item)
     },
     clone (slider) {
       let newItem = JSON.parse(JSON.stringify(slider))

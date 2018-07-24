@@ -29,7 +29,7 @@
 <script>
 import * as SOC from '@/relay/socket.io.js'
 import vueSlider from 'vue-slider-component'
-var throttle = require('lodash.throttle')
+import _ from 'lodash'
 
 export default {
   components: {
@@ -56,9 +56,9 @@ export default {
     }, false)
   },
   methods: {
-    onInput: throttle((item) => {
+    onInput: _.debounce((item) => {
       SOC.sync.update(item)
-    }, 100),
+    }, 16.6667 * 10, { maxWait: 333.333 }),
     onKeyStroke (item) {
       SOC.sync.update(item)
     },

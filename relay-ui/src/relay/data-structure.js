@@ -58,7 +58,10 @@ export const DataTypes = [
         name: this.name,
         type: this._id,
         ready: false,
-        path: 'drawing/my-drawings'
+        path: 'drawing/my-drawings',
+
+        undo: [],
+        lines: []
       }
     }
   }
