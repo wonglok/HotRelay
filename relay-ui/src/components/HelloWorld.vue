@@ -1,59 +1,75 @@
 <template>
   <div class="hello">
-    <button @click="load">Select Folder on PC / Mac</button>
+    <h2>Hot Relay Configuration</h2>
+    <button @click="loadFolder">Select Server's Hot Realy Folder then Load Data</button>
 
     <div class="fun" v-if="root.ready">
 
-      <input type="range" step="0.000001" min="-100" max="100" v-model="root.state.slider" @input="tell">
-      <button @click="saveToDisk">Save to Disk</button><span v-if="root.unsaved">File Unsaved</span>
-      <pre>{{ root.state }}</pre>
+      <!-- <input type="range" step="0.000001" min="-100" max="100" v-model="root.state.slider" @input="tell"> -->
+      <button @click="saveToDisk">Commit To Server's Disk</button><span v-if="!root.saved">haven't commit to server's disk</span>
+
+      <ItemMaker />
+      <ItemList @itemID="(v) => { itemID = v }" />
+      <ItemEditor class="item-editor" v-if="itemID" :itemID="itemID" @close="() => { itemID = false }" />
+
+      <pre class="pre">{{ root }}</pre>
     </div>
 
   </div>
 </template>
 
 <script>
-import * as SOC from '../socket.io.js'
-
+import * as SOC from '@/relay/socket.io.js'
+import ItemList from './pages/ItemList/ItemList.vue'
+import ItemMaker from './pages/ItemMaker/ItemMaker.vue'
+import ItemEditor from './pages/ItemEditor/ItemEditor.vue'
 export default {
+  components: {
+    ItemList,
+    ItemMaker,
+    ItemEditor
+  },
   name: 'HelloWorld',
   data () {
     return {
-      root: SOC.root,
-      slider: 0,
-      msg: 'Welcome to Your Vue.js App'
+      itemID: false,
+      root: SOC.root
     }
   },
   mounted () {
   },
   methods: {
-    load () {
-      SOC.$emit('load-folder')
+    loadFolder () {
+      SOC.sync.loadFolder()
     },
     saveToDisk () {
-      SOC.$emit('commit-to-disk')
-    },
-    tell () {
-      SOC.$emit('tell-state', this.root.state)
+      SOC.sync.commitToDisk()
     }
+    // tell () {
+    //   SOC.sync.tell(this.root.state)
+    // }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
-  font-weight: normal;
+.hello{
+  margin: 30px;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+
+.item-editor{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255,255,255,0.8);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+
+.pre{
+  overflow-x: auto;
 }
 </style>

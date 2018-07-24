@@ -1,3 +1,5 @@
 module.exports = {
-  folder: false
+  folder: false,
+  saved: false,
+  timer: 0
 }

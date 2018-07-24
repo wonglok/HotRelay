@@ -17,13 +17,47 @@ const path = require('path');
 const CURRENT_FILE = 'state.json';
 const CURRENT_FOLDER = './Hot_Relay_Current';
 const BACKUP_FOLDER = './Hot_Relay_Backups';
+function formatDate(date) {
+  var monthNames = [
+    '1', '2', '3',
+    '4', '5', '6', '7',
+    '8', '9', '10',
+    '11', '12'
+  ];
+
+  var day = date.getDate();
+  var monthIndex = date.getMonth();
+  var year = date.getFullYear();
+
+  return `${year}-${monthNames[monthIndex]}-${day}`
+}
+function toTime (date) {
+  function pad(number) {
+    if (number < 10) {
+      return '0' + number;
+    }
+    return number;
+  }
+  return 'Time' + pad(date.getHours()) +
+  '.' + pad(date.getMinutes()) +
+  '.' + pad(date.getSeconds()) +
+  '.' + (date.getMilliseconds() / 1000).toFixed(3).slice(2, 5)
+}
 
 // get latest time backup name
 const getBackupName = () => {
   var date = new Date()
-  var time = date.getTime()
-  var backup = 'backup-' + time + '.json'
+  var backup = 'backup-' + formatDate(date) + '@' + toTime(date) + '.json'
   return backup
+}
+
+const getBackupFolderRoot = () => {
+  return path.join(memory.folder, BACKUP_FOLDER)
+}
+
+const getBackupFolder = () => {
+  var date = new Date()
+  return path.join(memory.folder, BACKUP_FOLDER, './' + formatDate(date))
 }
 
 const Dialog = electron.dialog;
@@ -48,33 +82,43 @@ srv.on('load-folder' , () => {
   loadFolder()
 })
 
-srv.on('shall-backup-later', ({ io }) => {
-  io.emit('not-yet-saved-to-disk')
+srv.on('shall-backup-later', () => {
+  memory.saved = false
+  srv.emit('state-saved')
   clearTimeout(memory.timer || 0)
   memory.timer = setTimeout(() => {
     srv.emit('commit-to-disk')
-    io.emit('saved-to-disk')
+    memory.saved = true
+    srv.emit('state-saved')
   }, 1000 * 60)
 })
 
+async function provideBackupFolder () {
+  if (memory.folder) {
+    let rootFolder = getBackupFolderRoot()
+    if (!await fileExists(rootFolder)) {
+      mkdirp.sync(rootFolder)
+    }
+
+    let folder = getBackupFolder()
+    if (!await fileExists(folder)) {
+      mkdirp.sync(folder)
+    }
+  } else {
+    throw new Error('no folder set')
+  }
+}
+
+async function provideCurrentFolder () {
+  let folder = path.join(memory.folder, CURRENT_FOLDER)
+  if (!await fileExists(folder)) {
+    mkdirp.sync(folder)
+  }
+}
+
 srv.on('folder-selected', async () => {
-  async function provideBackupFolder () {
-    let folder = path.join(memory.folder, BACKUP_FOLDER)
-    if (!await fileExists(folder)) {
-      mkdirp.sync(folder)
-    }
-  }
-
-  async function provideCurrentFolder () {
-    let folder = path.join(memory.folder, CURRENT_FOLDER)
-    if (!await fileExists(folder)) {
-      mkdirp.sync(folder)
-      srv.emit('commit-to-disk')
-    }
-  }
-
-  provideCurrentFolder()
-  provideBackupFolder()
+  await provideCurrentFolder()
+  await provideBackupFolder()
   let currentFile = path.join(memory.folder, CURRENT_FOLDER, CURRENT_FILE);
   if (await fileExists(currentFile)) {
     let str = await readFile(currentFile)
@@ -82,29 +126,24 @@ srv.on('folder-selected', async () => {
     Object.keys(obj).forEach((aKey) => {
       state[aKey] = obj[aKey]
     })
+    memory.saved = true
+    srv.emit('state-saved')
+    //if there is no state file then save a state file
+  } else {
+    srv.emit('commit-to-disk')
   }
+
   srv.emit('update-all-client-state', state)
+
+  memory.ready = true
+  srv.emit('root-ready', memory.ready)
 })
 
 srv.on('commit-to-disk', async () => {
   if (memory.folder) {
-    async function provideBackupFolder () {
-      let folder = path.join(memory.folder, BACKUP_FOLDER)
-      if (!await fileExists(folder)) {
-        mkdirp.sync(folder)
-      }
-    }
-
-    async function provideCurrentFolder () {
-      let folder = path.join(memory.folder, CURRENT_FOLDER)
-      if (!await fileExists(folder)) {
-        mkdirp.sync(folder)
-      }
-    }
-
     let currentFile = path.join(memory.folder, CURRENT_FOLDER, CURRENT_FILE);
     if (await fileExists(currentFile)) {
-      let newPath = path.join(memory.folder, BACKUP_FOLDER, getBackupName())
+      let newPath = path.join(getBackupFolder(), getBackupName())
       provideBackupFolder()
       await moveFile(currentFile, newPath)
     }
@@ -113,6 +152,9 @@ srv.on('commit-to-disk', async () => {
 
     state.time = new Date()
     srv.emit('update-all-client-state', state)
+
+    memory.saved = true
+    srv.emit('state-saved')
 
     let newFileData = JSON.stringify(state, null, '\t')
     await save(newFileData, currentFile)
